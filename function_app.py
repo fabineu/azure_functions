@@ -1,6 +1,7 @@
 import azure.functions as func
 import logging
 from sum_model import summarize_text
+import json
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -18,13 +19,15 @@ def summarize(req: func.HttpRequest) -> func.HttpResponse:
             text = req_body.get('text')
 
     if text:
-        print('Summarizing')
         summary = summarize_text(text)
-        print(summary)
-        return func.HttpResponse(f"{summary}")
+        return func.HttpResponse(
+            json.dumps({'summary': summary}),
+            mimetype="application/json",      
+            status_code=200
+        )
     
     else:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+             "This HTTP triggered function executed successfully. Pass a text in the query string or in the request body for a summary.",
              status_code=200
         )
